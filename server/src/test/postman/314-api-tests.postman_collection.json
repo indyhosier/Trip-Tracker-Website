@@ -1,0 +1,456 @@
+{
+	"info": {
+		"_postman_id": "c279c816-401a-4e23-8883-9294cc5128e6",
+		"name": "314-api-tests",
+		"description": "This collection contains tests for the various API requests in the CS314 webapp.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "config",
+			"item": [
+				{
+					"name": "Config Post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response is HTTP200 status\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Server-side team name is correct\", () => {",
+									"    const response = pm.response.json();",
+									"    const expectedTeamName = pm.collectionVariables.get(\"TEAM_NAME\");",
+									"    pm.expect(response.serverName).to.eql(expectedTeamName);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"requestType\": \"config\",\n    \"features\": [\"config\"] \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/config",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"config"
+							]
+						},
+						"description": "Testing the result of Config Post requests."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Find Post",
+			"item": [
+				{
+					"name": "Find Venus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response is HTTP200 status\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Correct number of places returned\", () => {",
+									"    const response = pm.response.json();",
+									"    const expectedNumOfPlaces = 3;",
+									"    pm.expect(response.places.length).to.eql(expectedNumOfPlaces);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"requestType\": \"find\",\n    \"match\": \"Venus\",\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/find",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"find"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Distances",
+			"item": [
+				{
+					"name": "Max Radius Exceeded",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Max radius exceeded. Should be bad request\", () => {",
+									"    pm.expect(pm.response.to.have.status(400));",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\": \"distances\",\n  \"places\": [\n    { \"latitude\": \"1\", \"longitude\": \"1\" },\n    { \"latitude\": \"2\", \"longitude\": \"3\" },\n    { \"latitude\": \"90\", \"longitude\": \"180\" }\n  ],\n  \"earthRadius\": 9223372036854775808\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", () => {",
+									"    pm.expect(pm.response.to.have.status(200));",
+									"});",
+									"",
+									"pm.test(\"Correct results returned\", () => {",
+									"    const expectedDistances = [11038, 10614, 11373];",
+									"    const distances = pm.response.json().distances",
+									"    pm.expect(distances).to.eql(expectedDistances);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\"    : \"distances\",\n  \"places\"         : [{\"name\":\"place1\", \"latitude\":  \"1.0\",  \"longitude\": \"2.0\"},\n                      {\"name\": \"place2\", \"latitude\":  \"40.0\", \"longitude\": \"105.0\"},\n                      {\"name\": \"place3\", \"latitude\":  \"40.0\", \"longitude\": \"-105.0\"}],\n  \"earthRadius\"    : 6371.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Radius too small",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Radius too small\", () => {",
+									"    pm.expect(pm.response.to.have.status(400));",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\"    : \"distances\",\n  \"places\"         : [{\"name\":\"place1\", \"latitude\":  \"1.0\",  \"longitude\": \"2.0\"},\n                      {\"name\": \"place2\", \"latitude\":  \"40.0\", \"longitude\": \"105.0\"},\n                      {\"name\": \"place3\", \"latitude\":  \"40.0\", \"longitude\": \"-105.0\"}],\n  \"earthRadius\"    : 0.99999999999999\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Only one place",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Returns 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"One distance returned and the distance is 0\", function() {",
+									"    let json = pm.response.json();",
+									"    pm.expect(json.distances).to.eql([0]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\": \"distances\",\n  \"places\": [\n    { \"latitude\": \"89.1\", \"longitude\": \"115.0\" }\n  ],\n  \"earthRadius\": 6371.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All places are the same",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"All distances returned are zero\", function() {",
+									"    let distances = pm.response.json().distances;",
+									"    for (let distance of distances) {",
+									"        pm.expect(distance).to.eql(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\": \"distances\",\n  \"places\": [\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" },\n    { \"latitude\": \"64.913513521\", \"longitude\": \"55.11111\" }\n  ],\n  \"earthRadius\": 6371.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No places in request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 200\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Distances returned is empty list\", function() {",
+									"    let distances = pm.response.json().distances;",
+									"    pm.expect(distances).to.be.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\": \"distances\",\n  \"places\": [],\n  \"earthRadius\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Overflows in distance calculation result in 400 status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status is 400\", function() {",
+									"    // number sent = 4611686018427387903",
+									"    // this is ~= java Long.MAX_VALUE / 2",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestType\"    : \"distances\",\n  \"places\"         : [\n                      {\"name\": \"place3\", \"latitude\": \"-90\", \"longitude\": \"-180\"},\n                      {\"name\": \"place4\", \"latitude\": \"90\", \"longitude\": \"180\"}\n                     ],\n  \"earthRadius\"    : 4611686018427387903.0\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/distances",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"distances"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "CURRENT_VERSION",
+			"value": "1"
+		},
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:8000"
+		},
+		{
+			"key": "TEAM_NAME",
+			"value": "t99 team name"
+		}
+	]
+}
